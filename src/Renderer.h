@@ -6,7 +6,7 @@ class Application;
 struct RendererPrivate;
 
 /**
- * @class Отрисовщик
+ * @brief Отрисовщик
  * 
  * Этот класс отрисовывает игру на экране
  */
@@ -24,8 +24,13 @@ public:
      * @brief Этот метод будет вызван, при изменениях в игре
      */
     void onGameChanged() override;
-    
+    /**
+	 * @brief Этот метод осуществляет поворот камеры относительно оси X
+	 */
 	void rotareCameraX(double angle);
+	/**
+	 * @brief Этот метод осуществляет поворот камеры относительно оси Y
+	 */
 	void rotareCameraY(double angle);
 
 private:

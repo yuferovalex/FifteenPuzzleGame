@@ -1,3 +1,5 @@
 *.user
-!/*/.lock
 /build/*
+!/build
+!/build/.lock
+

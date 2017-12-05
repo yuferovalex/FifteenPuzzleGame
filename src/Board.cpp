@@ -12,22 +12,22 @@ Board::Board()
 
 bool Board::canMoveRight() const
 {
-    return m_empty_y == 0;
+    return m_empty_y != 0;
 }
 
 bool Board::canMoveLeft() const
 {
-    return m_empty_y == m_size - 1;
+    return m_empty_y == 0;
 }
 
 bool Board::canMoveUp() const
 {
-    return m_empty_x == m_size - 1;
+    return m_empty_x == 0;
 }
 
 bool Board::canMoveDown() const
 {
-    return m_empty_x == 0;
+    return m_empty_x != 0;
 }
 
 void Board::moveRight()

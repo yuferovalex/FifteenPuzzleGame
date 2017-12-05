@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <gl/GL.h>
 #include <GL/glut.h>
+#include <SOIL.h>
 
 #include "Application.h"
 #include "Renderer.h"
@@ -14,19 +15,13 @@ struct RendererPrivate
     Game &game;
 	double camRotationX = 0;
 	double camRotationY = 0;
+	GLuint tileTexture;
+
+	void init();
+	void drawTile(Tile number);
 };
 
-namespace {
-
-void drawTile(int i, int j, Tile number)
-{
-
-}
-
-}
-
-Renderer::Renderer(Application &app, Game &game)
-    : d(new RendererPrivate(app, game))
+void RendererPrivate::init()
 {
 	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat mat_shininess[] = { 50.0 };
@@ -40,6 +35,104 @@ Renderer::Renderer(Application &app, Game &game)
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_TEXTURE_2D);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	tileTexture = SOIL_load_OGL_texture("./tile.png", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y);
+	if (tileTexture == 0) {
+		printf("SOIL loading error: '%s'\n", SOIL_last_result());
+		exit(EXIT_FAILURE);
+	}
+}
+
+void RendererPrivate::drawTile(Tile number)
+{
+	if (number == 0) {
+		return ;
+	}
+	// Size of cube
+	constexpr static const float size = 0.5;
+	// Texture quads size
+	constexpr const float tex_size = 0.25;	
+	// Face with number
+	const float tex_base_v = (int(number) / 4) * tex_size;
+	const float tex_base_u = (int(number) % 4) * tex_size;
+	// Base texture coords
+	const GLfloat tex_base[4][2]
+	{
+		{ tex_base_u + tex_size, tex_base_v },
+		{ tex_base_u + tex_size, tex_base_v + tex_size },
+		{ tex_base_u, tex_base_v + tex_size },
+		{ tex_base_u, tex_base_v }
+	};
+	// Other sides
+	constexpr const float tex_other_v = 0.0;
+	constexpr const float tex_other_u = 0.0;
+	// Other texture coords
+	constexpr const static GLfloat tex_other[4][2]
+	{
+		{ tex_other_v + tex_size, tex_other_u },
+		{ tex_other_v, tex_other_u },
+		{ tex_other_v, tex_other_u + tex_size },
+		{ tex_other_v + tex_size, tex_other_u + tex_size }
+	};
+	
+	constexpr const static GLfloat n[6][3] =
+	{
+		{ -1.0, 0.0, 0.0 },
+		{ 0.0, 1.0, 0.0 },
+		{ 1.0, 0.0, 0.0 },
+		{ 0.0, -1.0, 0.0 },
+		{ 0.0, 0.0, 1.0 },
+		{ 0.0, 0.0, -1.0 }
+	};
+	constexpr const static GLint faces[6][4] =
+	{
+		{ 0, 1, 2, 3 },
+		{ 3, 2, 6, 7 },
+		{ 7, 6, 5, 4 },
+		{ 4, 5, 1, 0 },
+		{ 5, 6, 2, 1 },
+		{ 7, 4, 0, 3 }
+	};
+	GLfloat v[8][3];
+	GLint i;
+
+	v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+	v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+	v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+	v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+	v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+	v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+	auto tex = tex_base;
+	for (i = 5; i >= 0; i--) {
+		tex = i == 4 ? tex_base : tex_other;
+		glBegin(GL_QUADS);
+		glNormal3fv(&n[i][0]);
+		
+		glTexCoord2fv(&tex[0][0]);
+		glVertex3fv(&v[faces[i][0]][0]);
+
+		glTexCoord2fv(&tex[1][0]);
+		glVertex3fv(&v[faces[i][1]][0]);
+
+		glTexCoord2fv(&tex[2][0]);
+		glVertex3fv(&v[faces[i][2]][0]);
+
+		glTexCoord2fv(&tex[3][0]);
+		glVertex3fv(&v[faces[i][3]][0]);
+
+		glEnd();
+	}
+}
+
+Renderer::Renderer(Application &app, Game &game)
+    : d(new RendererPrivate(app, game))
+{
+	d->init();
+	game.addObserver(this);
 }
 
 Renderer::~Renderer()
@@ -58,15 +151,16 @@ void Renderer::display()
 	glRotated(d->camRotationY, 0.0, 1.0, 0.0);
 
 	glTranslated(-0.75, 0.75, 0);
-	for (int i = 0; i < 4; ++i) {	
-		for (int j = 0; j < 4; ++j) {
-			auto c = ((i + 1) * (j + 1) + 10) / 32.;
-			glColor3f(c, c, c);
-			glutSolidCube(0.5);
+	glBindTexture(GL_TEXTURE_2D, d->tileTexture);
+	
+	for (auto row : d->game.board().tiles()) {
+		for (auto tile : row ) {
+			d->drawTile(tile);
 			glTranslated(0.5, 0, 0);
 		}
 		glTranslated(-2, -0.5, 0);
 	}
+
 	glutSwapBuffers();
 }
 

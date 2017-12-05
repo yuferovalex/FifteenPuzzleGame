@@ -18,20 +18,20 @@ int main(int argc, char *argv[])
     app.setKeyBoardFunction([&](char key, int, int) {
         switch (key) {
         case 'w': 
-            //game.moveUp(); 
-			renderer.rotareCameraX(+10.0);
+            game.moveUp(); 
+			//renderer.rotareCameraX(+10.0);
             break;
         case 'a': 
-            //game.moveLeft();
-			renderer.rotareCameraY(-10.0);
+            game.moveLeft();
+			//renderer.rotareCameraY(-10.0);
             break;
         case 's': 
-            //game.moveDown(); 
-			renderer.rotareCameraX(-10.0);
+            game.moveDown(); 
+			//renderer.rotareCameraX(-10.0);
             break;
         case 'd': 
-            //game.moveRight(); 
-			renderer.rotareCameraY(+10.0);
+            game.moveRight(); 
+			//renderer.rotareCameraY(+10.0);
             break;
         };
     });

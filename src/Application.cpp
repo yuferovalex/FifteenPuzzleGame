@@ -31,15 +31,6 @@ static void reshapeCallback(int w, int h)
 	}
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-    /*if(h == 0) h = 1;
-    double ratio = 1.0 * w / h;
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    
-    gluPerspective(45, ratio, 1, 1000);
-    glMatrixMode(GL_MODELVIEW);*/
 }
 
 } // namespace
