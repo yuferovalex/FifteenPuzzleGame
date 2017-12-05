@@ -13,6 +13,7 @@ class Game
 {
 public:
     Game();
+	~Game();
     /**
      * @brief Предикат окончания игры
      */
@@ -48,7 +49,15 @@ public:
      * @brief Сдвиг фишек влево.
      */
     void moveLeft();
-    
+    /**
+	 * @brief Сохранить игру
+	 */
+	void save();
+	/**
+	 * @brief Загрузить сохраненную игру
+	 */
+	void load();
+
 private:
     void checkOver();
     void emitGameChanged();

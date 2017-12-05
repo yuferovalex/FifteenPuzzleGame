@@ -1,5 +1,7 @@
 #include <exception>
 #include <GL/glut.h>
+
+#include "Menu.h"
 #include "Application.h"
 
 namespace {
@@ -7,6 +9,7 @@ namespace {
 static Application *app = nullptr;
 static Application::DisplayCallback  s_display;
 static Application::KeyboardCallback s_keyboard;
+static Application::SpecialCallback  s_speñial;
 
 static void displayCallback()
 {
@@ -16,6 +19,12 @@ static void displayCallback()
 static void keyboardCallback(unsigned char key, int x, int y)
 {
     if (s_keyboard) s_keyboard(key, x, y);
+}
+
+static void specialCallback(int key, int x, int y)
+{
+	int modifiers = glutGetModifiers();
+	if (s_speñial) s_speñial(key, modifiers, x, y);
 }
 
 static void reshapeCallback(int w, int h)
@@ -64,6 +73,7 @@ void Application::show(const char *title)
     glutKeyboardFunc(&::keyboardCallback);
     glutDisplayFunc(&::displayCallback);
     glutReshapeFunc(&::reshapeCallback);
+	glutSpecialFunc(&::specialCallback);
 }
 
 void Application::showFullScreen(const char *title)
@@ -87,7 +97,18 @@ void Application::setKeyBoardFunction(Application::KeyboardCallback keyboard)
     s_keyboard = keyboard;
 }
 
+void Application::setSpecialFunction(SpecialCallback special)
+{
+	s_speñial = special;
+}
+
 void Application::repaint()
 {
     glutPostRedisplay();
+}
+
+void Application::setMenu(Menu &&menu)
+{
+	glutSetMenu(menu.id());
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }

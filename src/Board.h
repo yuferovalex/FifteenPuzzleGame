@@ -61,6 +61,14 @@ public:
      * @brief Тасовка фишек
      */
     void shuffle();
+	/**
+	 * @brief Сериализация
+	 */
+	void serialize(std::ostream &os);
+	/**
+	 * @brief Десериализация
+	 */
+	void deserialize(std::istream &is);
 
 private:
     std::vector<std::vector<Tile>> m_tiles;

@@ -1,4 +1,4 @@
-#include <windows.h>
+#include <Windows.h>
 #include <gl/GL.h>
 #include <GL/glut.h>
 #include <SOIL.h>
@@ -8,46 +8,42 @@
 
 struct RendererPrivate
 {
-	RendererPrivate(Application &app, Game &game)
-		: app(app), game(game) {}
+	RendererPrivate(Application &app, Game &game);
 
     Application &app;
     Game &game;
 	double camRotationX = 0;
 	double camRotationY = 0;
-	GLuint tileTexture;
+	GLuint tileTexture = SOIL_CREATE_NEW_ID;
 
 	void init();
 	void drawTile(Tile number);
 };
 
+RendererPrivate::RendererPrivate(Application &app, Game &game)
+	: app(app), game(game)
+{}
+
 void RendererPrivate::init()
 {
-	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat mat_shininess[] = { 50.0 };
-	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_TEXTURE_2D);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-	tileTexture = SOIL_load_OGL_texture("./tile.png", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y);
-	if (tileTexture == 0) {
-		printf("SOIL loading error: '%s'\n", SOIL_last_result());
-		exit(EXIT_FAILURE);
-	}
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 100.0 };
+	GLfloat light_position[] = { 1.0, 1.0, 2.0, 0.0 };
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glShadeModel(GL_SMOOTH);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);	
 }
 
 void RendererPrivate::drawTile(Tile number)
 {
+	// Zero tile is empty 
 	if (number == 0) {
 		return ;
 	}
@@ -77,7 +73,6 @@ void RendererPrivate::drawTile(Tile number)
 		{ tex_other_v, tex_other_u + tex_size },
 		{ tex_other_v + tex_size, tex_other_u + tex_size }
 	};
-	
 	constexpr const static GLfloat n[6][3] =
 	{
 		{ -1.0, 0.0, 0.0 },
@@ -111,19 +106,14 @@ void RendererPrivate::drawTile(Tile number)
 		tex = i == 4 ? tex_base : tex_other;
 		glBegin(GL_QUADS);
 		glNormal3fv(&n[i][0]);
-		
 		glTexCoord2fv(&tex[0][0]);
 		glVertex3fv(&v[faces[i][0]][0]);
-
 		glTexCoord2fv(&tex[1][0]);
 		glVertex3fv(&v[faces[i][1]][0]);
-
 		glTexCoord2fv(&tex[2][0]);
 		glVertex3fv(&v[faces[i][2]][0]);
-
 		glTexCoord2fv(&tex[3][0]);
 		glVertex3fv(&v[faces[i][3]][0]);
-
 		glEnd();
 	}
 }
@@ -144,15 +134,12 @@ Renderer::~Renderer()
 void Renderer::display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glRotated(d->camRotationX, 1.0, 0.0, 0.0);
 	glRotated(d->camRotationY, 0.0, 1.0, 0.0);
-
 	glTranslated(-0.75, 0.75, 0);
 	glBindTexture(GL_TEXTURE_2D, d->tileTexture);
-	
 	for (auto row : d->game.board().tiles()) {
 		for (auto tile : row ) {
 			d->drawTile(tile);
@@ -160,7 +147,7 @@ void Renderer::display()
 		}
 		glTranslated(-2, -0.5, 0);
 	}
-
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glutSwapBuffers();
 }
 
@@ -178,5 +165,25 @@ void Renderer::rotareCameraX(double angle)
 void Renderer::rotareCameraY(double angle)
 {
 	d->camRotationY += angle;
+	d->app.repaint();
+}
+
+void Renderer::setTexturePath(path path)
+{
+	d->tileTexture = SOIL_load_OGL_texture
+	(	
+		path.string().c_str(), 
+		SOIL_LOAD_RGB, 
+		d->tileTexture, 
+		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y
+	);
+	if (d->tileTexture == 0) {
+		throw std::exception(SOIL_last_result());
+	}
+	glBindTexture(GL_TEXTURE_2D, d->tileTexture);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	d->app.repaint();
 }

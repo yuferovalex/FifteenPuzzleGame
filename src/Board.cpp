@@ -1,10 +1,11 @@
+#include <algorithm>
 #include <ctime>
 #include <random>
 
 #include "Board.h"
 
 static constexpr const size_t m_size { 4 };
-static constexpr const size_t m_suffleLoops { 1000 };
+static constexpr const size_t m_suffleLoops { 10000 };
 
 Board::Board()
     : m_tiles(m_size, std::vector<Tile>(m_size))
@@ -87,4 +88,40 @@ void Board::shuffle()
         moves[0] = m_empty_x != 0 ? &Board::moveDown  : &Board::moveUp;
         moves[1] = m_empty_y != 0 ? &Board::moveRight : &Board::moveLeft;
     }
+}
+
+void Board::serialize(std::ostream &os)
+{
+	for (auto &&row : m_tiles) {
+		for (auto &&tile : row) {
+			os << int(tile) << ' ';
+		}
+		os << '\n';
+	}
+}
+
+void Board::deserialize(std::istream &is)
+{
+	std::vector<std::vector<Tile>> tiles(m_size, std::vector<Tile>(m_size));
+	std::vector<Tile> check;
+	check.reserve(m_size * m_size);
+	int temp;
+	for (auto &row : tiles) {
+		for (auto &tile : row) {
+			is >> temp;
+			tile = static_cast<Tile>(temp);
+			check.push_back(static_cast<Tile>(temp));
+		}
+	}
+	// Check
+	std::sort(check.begin(), check.end());
+	Tile expected{ 0 };
+	for (auto &&actual : check) {
+		if (expected != actual) {
+			return;
+			//throw std::exception("Can't deserialize board");
+		}
+	}
+	// If ok 
+	m_tiles = tiles;
 }

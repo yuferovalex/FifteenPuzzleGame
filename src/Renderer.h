@@ -1,9 +1,12 @@
 #pragma once
 
+#include <experimental/filesystem> 
 #include "Game.h"
 
 class Application;
 struct RendererPrivate;
+
+using namespace std::experimental::filesystem;
 
 /**
  * @brief Отрисовщик
@@ -32,6 +35,10 @@ public:
 	 * @brief Этот метод осуществляет поворот камеры относительно оси Y
 	 */
 	void rotareCameraY(double angle);
+	/**
+	 * @brief Этот метод устанавливает текстуру для клеток
+	 */
+	void setTexturePath(path texture);
 
 private:
     RendererPrivate *d;
