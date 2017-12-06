@@ -2,8 +2,13 @@
 
 #include "Game.h"
 
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+#ifndef __MINGW32__
+#  include <experimental/filesystem>
+   namespace fs = std::experimental::filesystem;
+#else
+#  include <boost/filesystem.hpp>
+   namespace fs = boost::filesystem;
+#endif
 
 class Application;
 struct RendererPrivate;

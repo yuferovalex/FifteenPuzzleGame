@@ -24,7 +24,14 @@ target_link_libraries(app
 	${OPENGL_LIBRARIES} 
 )
 
-file(GLOB SHARED_FILES "shared/*")
+if (MINGW)
+	find_package(Boost REQUIRED filesystem)
+	target_link_libraries(app 
+		${Boost_LIBRARIES}
+	)
+	include_directories(${Boost_INCLUDE_DIRS})
+endif(MINGW)
 
+file(GLOB SHARED_FILES "shared/*")
 install(TARGETS app DESTINATION bin CONFIGURATIONS Release)
 install(FILES ${SHARED_FILES} DESTINATION shared)
