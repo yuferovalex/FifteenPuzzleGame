@@ -26,5 +26,5 @@ target_link_libraries(app
 
 file(GLOB SHARED_FILES "shared/*")
 
-install(TARGETS app DESTINATION bin)
+install(TARGETS app DESTINATION bin CONFIGURATIONS Release)
 install(FILES ${SHARED_FILES} DESTINATION shared)
