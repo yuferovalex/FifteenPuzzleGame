@@ -2,12 +2,11 @@
 
 #include "Game.h"
 
-#include <boost/filesystem.hpp> 
-namespace fs = boost::filesystem;
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 
 class Application;
 struct RendererPrivate;
-
 
 /**
  * @brief Отрисовщик
