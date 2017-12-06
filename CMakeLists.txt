@@ -7,11 +7,11 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
-add_subdirectory(lib/soil)
+add_subdirectory(soil)
 include_directories(
 	${GLUT_INCLUDE_DIR} 
 	${OPENGL_INCLUDE_DIR} 
-	./lib/soil/src
+	soil/src
 )
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
