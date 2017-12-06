@@ -25,11 +25,7 @@ target_link_libraries(app
 )
 
 if (MINGW)
-	find_package(Boost REQUIRED filesystem)
-	target_link_libraries(app 
-		${Boost_LIBRARIES}
-	)
-	include_directories(${Boost_INCLUDE_DIRS})
+	target_link_libraries(app stdc++fs)
 endif(MINGW)
 
 file(GLOB SHARED_FILES "shared/*")

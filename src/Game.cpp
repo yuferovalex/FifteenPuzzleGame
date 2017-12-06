@@ -1,14 +1,12 @@
 #include <Windows.h>
 #include <fstream>
+#include "Application.h"
 #include "Game.h"
 
-Game::Game()
+Game::Game(Application &app)
+	: m_app(app)
 {
     newGame();
-}
-
-Game::~Game()
-{
 }
 
 void Game::addObserver(GameObserver *obs)
@@ -20,6 +18,7 @@ void Game::newGame()
 {
     m_board.init();
     m_board.shuffle();
+	m_isOver = false;
     emitGameChanged();
 }
 
@@ -87,7 +86,9 @@ void Game::emitGameChanged()
     for (auto &&obs : m_observers) {
         obs->onGameChanged();
     }
+	m_app.processEvents();
 	if (isOver()) {
 		MessageBoxA(0, "You win", "Fifteen", MB_ICONINFORMATION | MB_OK);
+		newGame();
 	}
 }

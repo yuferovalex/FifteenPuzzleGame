@@ -123,6 +123,7 @@ void Board::deserialize(std::istream &is)
 			return;
 			//throw std::exception("Can't deserialize board");
 		}
+        ++expected;
 	}
 	// If ok 
 	m_tiles = tiles;

@@ -2,6 +2,7 @@
 
 #include "Board.h"
 
+class Application;
 class GameObserver;
 
 /**
@@ -12,8 +13,7 @@ class GameObserver;
 class Game
 {
 public:
-    Game();
-	~Game();
+    Game(Application &app);
     /**
      * @brief Предикат окончания игры
      */
@@ -62,6 +62,7 @@ private:
     void checkOver();
     void emitGameChanged();
     
+	Application &m_app;
     std::vector<GameObserver *> m_observers;
     Board m_board;
     bool m_isOver = false;

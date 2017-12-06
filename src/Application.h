@@ -61,4 +61,15 @@ public:
 	 * @brief Этот метод устанавливает меню
 	 */
 	void setMenu(Menu &&menu);
+	/**
+	 * @brief Этот метод посылает сигнал завершения приложения
+	 */
+	void exit();
+	/**
+	 * @brief Этот метод запускает обработку накопившихся сообщений
+	 */
+	void processEvents();
+	
+private:
+	bool m_isWork = true;
 };

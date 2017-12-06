@@ -8,35 +8,24 @@
 #include "Menu.h"
 #include "Renderer.h"
 
-template<typename F> 
-struct FinalAction
-{
-public:
-	FinalAction(F f) : clean{ f } {}
-	~FinalAction() { clean(); }
+static const char s_title[] = "Fifteen";
 
-private:
-	F clean;
-};
-
-template<class F>
-FinalAction<F> finally(F f)
-{
-	return FinalAction<F> { f };
-}
+static const char s_about[] =
+    "Fifteen Puzzle Game\n"
+    "Created by Yuferov Aleksandr, ET-414, SUSU 2017\n"
+    "\n"
+    "Use W, A, S, D for game movements\n"
+    "Use Up, Down, Left, Right for camera movement";
 
 int main(int argc, char *argv[]) 
 {
     Application app(argc, argv);
 
-    app.show("Fifteen");
-    // app.showFullScreen("Fifteen");
+    app.show(s_title);
+    // app.showFullScreen(s_title);
 
-    Game game;
-	game.load();
-	auto _ = ::finally([&]() { 
-		game.save(); 
-	});
+    Game game(app);
+    game.load();
 
     Renderer renderer(app, game);
 	fs::path defaultTexPath{ "../shared/default.png" };
@@ -45,30 +34,42 @@ int main(int argc, char *argv[])
 		renderer.setTexturePath(defaultTexPath);
 	}
 	catch (std::exception &) {
-		MessageBoxA(0, "Can't find or open file \"default.png\"", "Fifteen", MB_ICONERROR | MB_OK);
+        MessageBoxA(0, "Can't find or open file \"default.png\"", s_title, MB_ICONERROR | MB_OK);
 		return EXIT_FAILURE;
 	}
 
     app.setDisplayFunction([&]() { 
         renderer.display(); 
     });
-    app.setKeyBoardFunction([&](unsigned char key, int, int) {
+    app.setKeyBoardFunction([&](char key, int, int) {
 		constexpr const unsigned char esc = 27;
         switch (key) {
-        case 'w': 
+        case 'w':
+		case 'W':
+		case 'ö':
+		case 'Ö':
             game.moveUp(); 
             break;
-        case 'a': 
+        case 'a':
+		case 'A':
+		case 'ô':
+		case 'Ô':
             game.moveLeft();
             break;
-        case 's': 
+        case 's':
+		case 'S':
+		case 'û':
+		case 'Û':
             game.moveDown(); 
             break;
-        case 'd': 
+        case 'd':
+		case 'D':
+		case 'â':
+		case 'Â':
             game.moveRight(); 
             break;
 		case esc:
-			glutLeaveMainLoop();
+			app.exit();
 			break;
         };
     });
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
 					renderer.setTexturePath(entry.path());
 				}
 				catch (std::exception &) {
-					MessageBoxA(0, "Can't use this file", "Fifteen", MB_ICONERROR | MB_OK);
+                    MessageBoxA(0, "Can't use this file", s_title, MB_ICONERROR | MB_OK);
 					renderer.setTexturePath(defaultTexPath);
 				}
 			});
@@ -111,13 +112,15 @@ int main(int argc, char *argv[])
 
 	auto gameMenu = Menu()
 		.addMenuEntry("New game", [&]() { game.newGame(); })
-		.addMenuEntry("Exit", [&]() { glutLeaveMainLoop(); });
+		.addMenuEntry("Exit", [&]() { app.exit(); });
 
 	auto mainMenu = Menu()
 		.addSubMenu("Game", std::move(gameMenu))
-		.addSubMenu("Texture", std::move(textureMenu));
+        .addSubMenu("Texture", std::move(textureMenu))
+        .addMenuEntry("About", [](){ MessageBoxA(0, s_about, s_title, MB_OK); });
 
 	app.setMenu(std::move(mainMenu));
 
 	app.exec();
+    game.save();
 }

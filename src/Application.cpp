@@ -1,5 +1,7 @@
 #include <stdexcept>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
+#include <chrono>
+#include <thread>
 
 #include "Menu.h"
 #include "Application.h"
@@ -74,6 +76,7 @@ void Application::show(const char *title)
     glutDisplayFunc(&::displayCallback);
     glutReshapeFunc(&::reshapeCallback);
 	glutSpecialFunc(&::specialCallback);
+    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 }
 
 void Application::showFullScreen(const char *title)
@@ -84,7 +87,7 @@ void Application::showFullScreen(const char *title)
 
 void Application::exec()
 {
-    glutMainLoop();
+	glutMainLoop();
 }
 
 void Application::setDisplayFunction(Application::DisplayCallback display)
@@ -111,4 +114,14 @@ void Application::setMenu(Menu &&menu)
 {
 	glutSetMenu(menu.id());
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void Application::exit()
+{
+	glutLeaveMainLoop();
+}
+
+void Application::processEvents()
+{
+	glutMainLoopEvent();
 }
