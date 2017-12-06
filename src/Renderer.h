@@ -1,12 +1,13 @@
 #pragma once
 
-#include <experimental/filesystem> 
 #include "Game.h"
+
+#include <boost/filesystem.hpp> 
+namespace fs = boost::filesystem;
 
 class Application;
 struct RendererPrivate;
 
-using namespace std::experimental::filesystem;
 
 /**
  * @brief Отрисовщик
@@ -38,7 +39,7 @@ public:
 	/**
 	 * @brief Этот метод устанавливает текстуру для клеток
 	 */
-	void setTexturePath(path texture);
+	void setTexturePath(fs::path texture);
 
 private:
     RendererPrivate *d;

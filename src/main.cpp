@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	});
 
     Renderer renderer(app, game);
-	path defaultTexPath{ "default.png" };
+	fs::path defaultTexPath{ "default.png" };
 
 	try {
 		renderer.setTexturePath(defaultTexPath);
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 	regex re("\\.(png|jpg|jpeg|bmp)");
 
 	Menu textureMenu;
-	for (auto &&entry : directory_iterator(".")) {
+	for (auto &&entry : fs::directory_iterator(".")) {
 		if (is_regular_file(entry) && regex_match(entry.path().extension().string(), re)) {
 			textureMenu.addMenuEntry(entry.path().stem().string(), [&renderer, defaultTexPath, entry]() {
 				try {

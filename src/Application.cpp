@@ -1,4 +1,4 @@
-#include <exception>
+#include <stdexcept>
 #include <GL/glut.h>
 
 #include "Menu.h"
@@ -9,7 +9,7 @@ namespace {
 static Application *app = nullptr;
 static Application::DisplayCallback  s_display;
 static Application::KeyboardCallback s_keyboard;
-static Application::SpecialCallback  s_speñial;
+static Application::SpecialCallback  s_special;
 
 static void displayCallback()
 {
@@ -24,7 +24,7 @@ static void keyboardCallback(unsigned char key, int x, int y)
 static void specialCallback(int key, int x, int y)
 {
 	int modifiers = glutGetModifiers();
-	if (s_speñial) s_speñial(key, modifiers, x, y);
+	if (s_special) s_special(key, modifiers, x, y);
 }
 
 static void reshapeCallback(int w, int h)
@@ -47,7 +47,7 @@ static void reshapeCallback(int w, int h)
 Application::Application(int argc, char *argv[])
 {
     if (app != nullptr) {
-        throw std::exception("Application already exists");
+        throw std::logic_error("Application already exists");
     }
     app = this;
     glutInit(&argc, argv);
@@ -99,7 +99,7 @@ void Application::setKeyBoardFunction(Application::KeyboardCallback keyboard)
 
 void Application::setSpecialFunction(SpecialCallback special)
 {
-	s_speñial = special;
+	s_special = special;
 }
 
 void Application::repaint()

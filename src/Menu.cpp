@@ -1,4 +1,5 @@
 #include <GL/glut.h>
+#include <stdexcept>
 #include "Menu.h"
 
 std::map<int, Menu::MenuCallback> Menu::m_callbacks;
@@ -19,7 +20,7 @@ Menu::Menu()
 Menu &Menu::addMenuEntry(std::string title, MenuCallback callback)
 {
 	if (m_lastMenuChanged != m_id) {
-		throw std::exception("Can't add menu entry to this menu");
+		throw std::logic_error("Can't add menu entry to this menu");
 	}
 	glutAddMenuEntry(title.c_str(), m_lastCallbackId);
 	m_callbacks[m_lastCallbackId] = callback;
@@ -30,7 +31,7 @@ Menu &Menu::addMenuEntry(std::string title, MenuCallback callback)
 Menu &Menu::addSubMenu(std::string title, Menu &&menu)
 {
 	if (m_lastMenuChanged != m_id) {
-		throw std::exception("Can't add menu entry to this menu");
+		throw std::logic_error("Can't add menu entry to this menu");
 	}
 	glutAddSubMenu(title.c_str(), menu.m_id);
 	return *this;

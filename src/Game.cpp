@@ -9,7 +9,6 @@ Game::Game()
 
 Game::~Game()
 {
-	printf("game deleted");
 }
 
 void Game::addObserver(GameObserver *obs)

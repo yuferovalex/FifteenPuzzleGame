@@ -2,6 +2,7 @@
 #include <gl/GL.h>
 #include <GL/glut.h>
 #include <SOIL.h>
+#include <stdexcept>
 
 #include "Application.h"
 #include "Renderer.h"
@@ -168,7 +169,7 @@ void Renderer::rotareCameraY(double angle)
 	d->app.repaint();
 }
 
-void Renderer::setTexturePath(path path)
+void Renderer::setTexturePath(fs::path path)
 {
 	d->tileTexture = SOIL_load_OGL_texture
 	(	
@@ -178,7 +179,7 @@ void Renderer::setTexturePath(path path)
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y
 	);
 	if (d->tileTexture == 0) {
-		throw std::exception(SOIL_last_result());
+		throw std::runtime_error(SOIL_last_result());
 	}
 	glBindTexture(GL_TEXTURE_2D, d->tileTexture);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

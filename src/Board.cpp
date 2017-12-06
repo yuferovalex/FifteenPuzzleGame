@@ -1,5 +1,7 @@
 #include <algorithm>
 #include <ctime>
+#include <istream>
+#include <ostream>
 #include <random>
 
 #include "Board.h"
@@ -84,7 +86,7 @@ void Board::shuffle()
     MoveFunc moves[2] { &Board::moveUp, &Board::moveLeft };
     std::mt19937 generator(static_cast<uint32_t>(time(nullptr)));
     for (size_t i = 0; i < m_suffleLoops; ++i) {
-        std::invoke(moves[generator() % 2], this);
+        (this->*moves[generator() % 2])();
         moves[0] = m_empty_x != 0 ? &Board::moveDown  : &Board::moveUp;
         moves[1] = m_empty_y != 0 ? &Board::moveRight : &Board::moveLeft;
     }
