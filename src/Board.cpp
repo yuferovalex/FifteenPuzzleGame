@@ -2,12 +2,13 @@
 #include <ctime>
 #include <istream>
 #include <ostream>
+#include <functional>
 #include <random>
+#include <stdexcept>
 
 #include "Board.h"
 
 static constexpr const size_t m_size { 4 };
-static constexpr const size_t m_suffleLoops { 10000 };
 
 Board::Board()
     : m_tiles(m_size, std::vector<Tile>(m_size))
@@ -85,8 +86,9 @@ void Board::shuffle()
     typedef void (Board::*MoveFunc)();
     MoveFunc moves[2] { &Board::moveUp, &Board::moveLeft };
     std::mt19937 generator(static_cast<uint32_t>(time(nullptr)));
-    for (size_t i = 0; i < m_suffleLoops; ++i) {
-        (this->*moves[generator() % 2])();
+	size_t loops = 1000 + rand() % 100000;
+    for (size_t i = 0; i < loops; ++i) {
+        std::invoke(moves[generator() % 2], this);
         moves[0] = m_empty_x != 0 ? &Board::moveDown  : &Board::moveUp;
         moves[1] = m_empty_y != 0 ? &Board::moveRight : &Board::moveLeft;
     }
@@ -120,8 +122,7 @@ void Board::deserialize(std::istream &is)
 	Tile expected{ 0 };
 	for (auto &&actual : check) {
 		if (expected != actual) {
-			return;
-			//throw std::exception("Can't deserialize board");
+			throw std::runtime_error("Can't deserialize board");
 		}
         ++expected;
 	}

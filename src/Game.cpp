@@ -6,7 +6,6 @@
 Game::Game(Application &app)
 	: m_app(app)
 {
-    newGame();
 }
 
 void Game::addObserver(GameObserver *obs)

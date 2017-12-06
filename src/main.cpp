@@ -25,8 +25,12 @@ int main(int argc, char *argv[])
     // app.showFullScreen(s_title);
 
     Game game(app);
-    game.load();
-
+	try {
+		game.load();
+	} catch (std::exception &) {
+		game.newGame();
+	}
+	
     Renderer renderer(app, game);
 	fs::path defaultTexPath{ "../shared/default.png" };
 
