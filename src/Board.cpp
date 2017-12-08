@@ -8,7 +8,8 @@
 
 #include "Board.h"
 
-static constexpr const size_t m_size { 4 };
+constexpr size_t m_size { 4 };
+constexpr size_t m_suffleLoops { 1000 };
 
 Board::Board()
     : m_tiles(m_size, std::vector<Tile>(m_size))
@@ -16,58 +17,50 @@ Board::Board()
 
 bool Board::canMoveRight() const
 {
-    return m_empty_y != 0;
+    return m_empty_y < m_size - 1;
 }
 
 bool Board::canMoveLeft() const
 {
-    return m_empty_y == 0;
+    return m_empty_y > 0;
 }
 
 bool Board::canMoveUp() const
 {
-    return m_empty_x == 0;
+    return m_empty_x > 0;
 }
 
 bool Board::canMoveDown() const
 {
-    return m_empty_x != 0;
+    return m_empty_x < m_size - 1;
 }
 
 void Board::moveRight()
 {
-    size_t i = m_empty_x;
-    for (size_t j = m_empty_y; j > 0; --j) {
-        std::swap(m_tiles[i][j], m_tiles[i][j - 1]);
-    }
-    m_empty_y = 0;
+    if (!canMoveRight()) return;
+    std::swap(m_tiles[m_empty_x][m_empty_y], m_tiles[m_empty_x][m_empty_y + 1]);
+    ++m_empty_y;
 }
 
 void Board::moveLeft()
 {
-    size_t i = m_empty_x;
-    for (size_t j = m_empty_y; j < m_size - 1; ++j) {
-        std::swap(m_tiles[i][j], m_tiles[i][j + 1]);
-    }
-    m_empty_y = m_size - 1;
+    if (!canMoveLeft()) return;
+    std::swap(m_tiles[m_empty_x][m_empty_y], m_tiles[m_empty_x][m_empty_y - 1]);
+    --m_empty_y;
 }
 
 void Board::moveDown()
 {
-    size_t j = m_empty_y;
-    for (size_t i = m_empty_x; i > 0; --i) {
-        std::swap(m_tiles[i][j], m_tiles[i - 1][j]);
-    }
-    m_empty_x = 0;
+    if (!canMoveDown()) return;
+    std::swap(m_tiles[m_empty_x][m_empty_y], m_tiles[m_empty_x + 1][m_empty_y]);
+    ++m_empty_x;
 }
 
 void Board::moveUp()
 {
-    size_t j = m_empty_y;
-    for (size_t i = m_empty_x; i < m_size - 1; ++i) {
-        std::swap(m_tiles[i][j], m_tiles[i + 1][j]);
-    }
-    m_empty_x = m_size - 1;
+    if (!canMoveUp()) return;
+    std::swap(m_tiles[m_empty_x][m_empty_y], m_tiles[m_empty_x - 1][m_empty_y]);
+    --m_empty_x;
 }
 
 void Board::init()
@@ -84,13 +77,11 @@ void Board::init()
 void Board::shuffle()
 {
     typedef void (Board::*MoveFunc)();
-    MoveFunc moves[2] { &Board::moveUp, &Board::moveLeft };
-    std::mt19937 generator(static_cast<uint32_t>(time(nullptr)));
-    size_t loops = 1000 + rand() % 100000;
-    for (size_t i = 0; i < loops; ++i) {
-        std::invoke(moves[generator() % 2], this);
-        moves[0] = m_empty_x != 0 ? &Board::moveDown  : &Board::moveUp;
-        moves[1] = m_empty_y != 0 ? &Board::moveRight : &Board::moveLeft;
+    MoveFunc move[] = { &Board::moveUp, &Board::moveDown, &Board::moveLeft, &Board::moveRight };
+    std::mt19937 rand(static_cast<uint32_t>(time(nullptr)));
+    std::uniform_int_distribution<> dist(0, std::size(move) - 1);
+    for (auto i = m_suffleLoops; i > 0; --i) {
+        std::invoke(move[dist(rand)], this);
     }
 }
 
@@ -110,12 +101,23 @@ void Board::deserialize(std::istream &is)
     std::vector<Tile> check;
     check.reserve(m_size * m_size);
     int temp;
+    int empty_x = 0;
+    int empty_y = 0;
+    int x = 0;
+    int y = 0;
     for (auto &row : tiles) {
+        y = 0;
         for (auto &tile : row) {
             is >> temp;
             tile = static_cast<Tile>(temp);
             check.push_back(static_cast<Tile>(temp));
+            if (temp == 0) {
+                empty_x = x;
+                empty_y = y;
+            }
+            ++y;
         }
+        ++x;
     }
     // Check
     std::sort(check.begin(), check.end());
@@ -128,4 +130,6 @@ void Board::deserialize(std::istream &is)
     }
     // If ok 
     m_tiles = tiles;
+    m_empty_x = empty_x;
+    m_empty_y = empty_y;
 }

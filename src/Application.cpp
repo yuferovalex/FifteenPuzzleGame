@@ -67,6 +67,7 @@ Application::~Application()
     app = nullptr;
     s_display = nullptr;
     s_keyboard = nullptr;
+	s_special = nullptr;
 }
 
 void Application::show(const char *title)
@@ -118,7 +119,7 @@ void Application::setMenu(Menu &&menu)
 
 void Application::exit()
 {
-    glutLeaveMainLoop();
+	glutLeaveMainLoop();
 }
 
 void Application::processEvents()
