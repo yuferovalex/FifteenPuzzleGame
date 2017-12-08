@@ -25,23 +25,23 @@ static void keyboardCallback(unsigned char key, int x, int y)
 
 static void specialCallback(int key, int x, int y)
 {
-	int modifiers = glutGetModifiers();
-	if (s_special) s_special(key, modifiers, x, y);
+    int modifiers = glutGetModifiers();
+    if (s_special) s_special(key, modifiers, x, y);
 }
 
 static void reshapeCallback(int w, int h)
 {
-	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	if (w <= h) {
-		glOrtho(-1.5, 1.5, -1.5*(GLfloat)h / (GLfloat)w, 1.5*(GLfloat)h / (GLfloat)w, -10.0, 10.0);
-	}
-	else {
-		glOrtho(-1.5*(GLfloat)w / (GLfloat)h, 1.5*(GLfloat)w / (GLfloat)h, -1.5, 1.5, -10.0, 10.0); 
-	}
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    if (w <= h) {
+        glOrtho(-1.5, 1.5, -1.5*(GLfloat)h / (GLfloat)w, 1.5*(GLfloat)h / (GLfloat)w, -10.0, 10.0);
+    }
+    else {
+        glOrtho(-1.5*(GLfloat)w / (GLfloat)h, 1.5*(GLfloat)w / (GLfloat)h, -1.5, 1.5, -10.0, 10.0); 
+    }
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 } // namespace
@@ -54,12 +54,12 @@ Application::Application(int argc, char *argv[])
     app = this;
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	const int width = 640;
-	const int height = 480;
-	const int x = (glutGet(GLUT_SCREEN_WIDTH) - width) / 2;
-	const int y = (glutGet(GLUT_SCREEN_HEIGHT) - height) / 2;
-	glutInitWindowPosition(x, y);
-	glutInitWindowSize(width, height);
+    const int width = 640;
+    const int height = 480;
+    const int x = (glutGet(GLUT_SCREEN_WIDTH) - width) / 2;
+    const int y = (glutGet(GLUT_SCREEN_HEIGHT) - height) / 2;
+    glutInitWindowPosition(x, y);
+    glutInitWindowSize(width, height);
 }
 
 Application::~Application()
@@ -75,7 +75,7 @@ void Application::show(const char *title)
     glutKeyboardFunc(&::keyboardCallback);
     glutDisplayFunc(&::displayCallback);
     glutReshapeFunc(&::reshapeCallback);
-	glutSpecialFunc(&::specialCallback);
+    glutSpecialFunc(&::specialCallback);
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 }
 
@@ -87,7 +87,7 @@ void Application::showFullScreen(const char *title)
 
 void Application::exec()
 {
-	glutMainLoop();
+    glutMainLoop();
 }
 
 void Application::setDisplayFunction(Application::DisplayCallback display)
@@ -102,7 +102,7 @@ void Application::setKeyBoardFunction(Application::KeyboardCallback keyboard)
 
 void Application::setSpecialFunction(SpecialCallback special)
 {
-	s_special = special;
+    s_special = special;
 }
 
 void Application::repaint()
@@ -112,16 +112,16 @@ void Application::repaint()
 
 void Application::setMenu(Menu &&menu)
 {
-	glutSetMenu(menu.id());
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
+    glutSetMenu(menu.id());
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void Application::exit()
 {
-	glutLeaveMainLoop();
+    glutLeaveMainLoop();
 }
 
 void Application::processEvents()
 {
-	glutMainLoopEvent();
+    glutMainLoopEvent();
 }

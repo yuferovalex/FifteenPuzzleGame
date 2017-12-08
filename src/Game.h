@@ -50,19 +50,19 @@ public:
      */
     void moveLeft();
     /**
-	 * @brief Сохранить игру
-	 */
-	void save();
-	/**
-	 * @brief Загрузить сохраненную игру
-	 */
-	void load();
+     * @brief Сохранить игру
+     */
+    void save();
+    /**
+     * @brief Загрузить сохраненную игру
+     */
+    void load();
 
 private:
     void checkOver();
     void emitGameChanged();
     
-	Application &m_app;
+    Application &m_app;
     std::vector<GameObserver *> m_observers;
     Board m_board;
     bool m_isOver = false;

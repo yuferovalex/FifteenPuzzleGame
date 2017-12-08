@@ -86,7 +86,7 @@ void Board::shuffle()
     typedef void (Board::*MoveFunc)();
     MoveFunc moves[2] { &Board::moveUp, &Board::moveLeft };
     std::mt19937 generator(static_cast<uint32_t>(time(nullptr)));
-	size_t loops = 1000 + rand() % 100000;
+    size_t loops = 1000 + rand() % 100000;
     for (size_t i = 0; i < loops; ++i) {
         std::invoke(moves[generator() % 2], this);
         moves[0] = m_empty_x != 0 ? &Board::moveDown  : &Board::moveUp;
@@ -96,36 +96,36 @@ void Board::shuffle()
 
 void Board::serialize(std::ostream &os)
 {
-	for (auto &&row : m_tiles) {
-		for (auto &&tile : row) {
-			os << int(tile) << ' ';
-		}
-		os << '\n';
-	}
+    for (auto &&row : m_tiles) {
+        for (auto &&tile : row) {
+            os << int(tile) << ' ';
+        }
+        os << '\n';
+    }
 }
 
 void Board::deserialize(std::istream &is)
 {
-	std::vector<std::vector<Tile>> tiles(m_size, std::vector<Tile>(m_size));
-	std::vector<Tile> check;
-	check.reserve(m_size * m_size);
-	int temp;
-	for (auto &row : tiles) {
-		for (auto &tile : row) {
-			is >> temp;
-			tile = static_cast<Tile>(temp);
-			check.push_back(static_cast<Tile>(temp));
-		}
-	}
-	// Check
-	std::sort(check.begin(), check.end());
-	Tile expected{ 0 };
-	for (auto &&actual : check) {
-		if (expected != actual) {
-			throw std::runtime_error("Can't deserialize board");
-		}
+    std::vector<std::vector<Tile>> tiles(m_size, std::vector<Tile>(m_size));
+    std::vector<Tile> check;
+    check.reserve(m_size * m_size);
+    int temp;
+    for (auto &row : tiles) {
+        for (auto &tile : row) {
+            is >> temp;
+            tile = static_cast<Tile>(temp);
+            check.push_back(static_cast<Tile>(temp));
+        }
+    }
+    // Check
+    std::sort(check.begin(), check.end());
+    Tile expected{ 0 };
+    for (auto &&actual : check) {
+        if (expected != actual) {
+            throw std::runtime_error("Can't deserialize board");
+        }
         ++expected;
-	}
-	// If ok 
-	m_tiles = tiles;
+    }
+    // If ok 
+    m_tiles = tiles;
 }

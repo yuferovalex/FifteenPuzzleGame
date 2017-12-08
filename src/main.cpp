@@ -25,106 +25,106 @@ int main(int argc, char *argv[])
     // app.showFullScreen(s_title);
 
     Game game(app);
-	try {
-		game.load();
-	} catch (std::exception &) {
-		game.newGame();
-	}
-	
+    try {
+        game.load();
+    } catch (std::exception &) {
+        game.newGame();
+    }
+    
     Renderer renderer(app, game);
-	fs::path defaultTexPath{ "../shared/default.png" };
+    fs::path defaultTexPath{ "../shared/default.png" };
 
-	try {
-		renderer.setTexturePath(defaultTexPath);
-	}
-	catch (std::exception &) {
+    try {
+        renderer.setTexturePath(defaultTexPath);
+    }
+    catch (std::exception &) {
         MessageBoxA(0, "Can't find or open file \"default.png\"", s_title, MB_ICONERROR | MB_OK);
-		return EXIT_FAILURE;
-	}
+        return EXIT_FAILURE;
+    }
 
     app.setDisplayFunction([&]() { 
         renderer.display(); 
     });
     app.setKeyBoardFunction([&](char key, int, int) {
-		constexpr const unsigned char esc = 27;
+        constexpr const unsigned char esc = 27;
         switch (key) {
         case 'w':
-		case 'W':
-		case 'ö':
-		case 'Ö':
+        case 'W':
+        case 'Ñ†':
+        case 'Ð¦':
             game.moveUp(); 
             break;
         case 'a':
-		case 'A':
-		case 'ô':
-		case 'Ô':
+        case 'A':
+        case 'Ñ„':
+        case 'Ð¤':
             game.moveLeft();
             break;
         case 's':
-		case 'S':
-		case 'û':
-		case 'Û':
+        case 'S':
+        case 'Ñ‹':
+        case 'Ð«':
             game.moveDown(); 
             break;
         case 'd':
-		case 'D':
-		case 'â':
-		case 'Â':
+        case 'D':
+        case 'Ð²':
+        case 'Ð’':
             game.moveRight(); 
             break;
-		case esc:
-			app.exit();
-			break;
+        case esc:
+            app.exit();
+            break;
         };
     });
-	app.setSpecialFunction([&](int key, int, int, int) {
-		constexpr const double angle = 10.0;
-		switch (key) {
-		case GLUT_KEY_UP:
-			renderer.rotareCameraX(+angle);
-			break;
-		case GLUT_KEY_DOWN:
-			renderer.rotareCameraX(-angle);
-			break;
-		case GLUT_KEY_LEFT:
-			renderer.rotareCameraY(-angle);
-			break;
-		case GLUT_KEY_RIGHT:
-			renderer.rotareCameraY(+angle);
-			break;
-		}
-	});
+    app.setSpecialFunction([&](int key, int, int, int) {
+        constexpr const double angle = 10.0;
+        switch (key) {
+        case GLUT_KEY_UP:
+            renderer.rotareCameraX(+angle);
+            break;
+        case GLUT_KEY_DOWN:
+            renderer.rotareCameraX(-angle);
+            break;
+        case GLUT_KEY_LEFT:
+            renderer.rotareCameraY(-angle);
+            break;
+        case GLUT_KEY_RIGHT:
+            renderer.rotareCameraY(+angle);
+            break;
+        }
+    });
 
-	using std::regex;
-	using std::regex_match;
-	regex re("\\.(png|jpg|jpeg|bmp)");
+    using std::regex;
+    using std::regex_match;
+    regex re("\\.(png|jpg|jpeg|bmp)");
 
-	Menu textureMenu;
-	for (auto &&entry : fs::directory_iterator("../shared")) {
-		if (fs::is_regular_file(entry) && regex_match(entry.path().extension().string(), re)) {
-			textureMenu.addMenuEntry(entry.path().stem().string(), [&renderer, defaultTexPath, entry]() {
-				try {
-					renderer.setTexturePath(entry.path());
-				}
-				catch (std::exception &) {
+    Menu textureMenu;
+    for (auto &&entry : fs::directory_iterator("../shared")) {
+        if (fs::is_regular_file(entry) && regex_match(entry.path().extension().string(), re)) {
+            textureMenu.addMenuEntry(entry.path().stem().string(), [&renderer, defaultTexPath, entry]() {
+                try {
+                    renderer.setTexturePath(entry.path());
+                }
+                catch (std::exception &) {
                     MessageBoxA(0, "Can't use this file", s_title, MB_ICONERROR | MB_OK);
-					renderer.setTexturePath(defaultTexPath);
-				}
-			});
-		}
-	}
+                    renderer.setTexturePath(defaultTexPath);
+                }
+            });
+        }
+    }
 
-	auto gameMenu = Menu()
-		.addMenuEntry("New game", [&]() { game.newGame(); })
-		.addMenuEntry("Exit", [&]() { app.exit(); });
+    auto gameMenu = Menu()
+        .addMenuEntry("New game", [&]() { game.newGame(); })
+        .addMenuEntry("Exit", [&]() { app.exit(); });
 
-	auto mainMenu = Menu()
-		.addSubMenu("Game", std::move(gameMenu))
+    auto mainMenu = Menu()
+        .addSubMenu("Game", std::move(gameMenu))
         .addSubMenu("Texture", std::move(textureMenu))
         .addMenuEntry("About", [](){ MessageBoxA(0, s_about, s_title, MB_OK); });
 
-	app.setMenu(std::move(mainMenu));
+    app.setMenu(std::move(mainMenu));
 
-	app.exec();
+    app.exec();
     game.save();
 }

@@ -28,17 +28,17 @@ public:
      */
     void onGameChanged() override;
     /**
-	 * @brief Этот метод осуществляет поворот камеры относительно оси X
-	 */
-	void rotareCameraX(double angle);
-	/**
-	 * @brief Этот метод осуществляет поворот камеры относительно оси Y
-	 */
-	void rotareCameraY(double angle);
-	/**
-	 * @brief Этот метод устанавливает текстуру для клеток
-	 */
-	void setTexturePath(fs::path texture);
+     * @brief Этот метод осуществляет поворот камеры относительно оси X
+     */
+    void rotareCameraX(double angle);
+    /**
+     * @brief Этот метод осуществляет поворот камеры относительно оси Y
+     */
+    void rotareCameraY(double angle);
+    /**
+     * @brief Этот метод устанавливает текстуру для клеток
+     */
+    void setTexturePath(fs::path texture);
 
 private:
     RendererPrivate *d;
